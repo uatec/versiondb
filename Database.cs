@@ -2,6 +2,7 @@ using System.Collections.Generic;
 
 namespace VersionDb
 {
+    // TODO: Data Store IOC
     public static class Database
     {
         static Dictionary<string, (string, object)> data = new Dictionary<string, (string, object)>();
@@ -15,5 +16,7 @@ namespace VersionDb
         {
             data[id] = (version, value);
         }
+
+        // TODO: Delete functionality
     }
 }

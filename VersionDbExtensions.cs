@@ -21,8 +21,11 @@ namespace VersionDb
             {
                 string id = context.GetRouteValue("id") as string;
                 string requestedVersion = context.GetRouteValue("version") as string;
+
+                // TODO: Not Found
                 (string dataVersion, object value) = Database.Get(id);
                 
+                // TODO: Handle unknown versions
                 Type requestedType = versions.Single(p => p.Key == requestedVersion).Value;
                 Type dataType = versions.Single(p => p.Key == dataVersion).Value;
 
@@ -36,6 +39,8 @@ namespace VersionDb
 
                 string id = context.GetRouteValue("id") as string;
                 string requestedVersion = context.GetRouteValue("version") as string;
+
+                // TODO: Handle unknown versions
                 Type type = versions.Single(p => p.Key == requestedVersion).Value;
 
                 string body = null;
@@ -51,6 +56,8 @@ namespace VersionDb
                 return context.Response.WriteAsync("ok");
             });
 
+            // TODO: Delete operations
+            // TODO: Correct Put/Post behaviour
 
             var routes = routeBuilder.Build();
             app.UseRouter(routes);

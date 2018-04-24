@@ -25,6 +25,7 @@ namespace VersionDb
                 app.UseDeveloperExceptionPage();
             }
 
+            // TODO: Choice of mapper
             AutoMapper.Mapper.Initialize(cfg => {
                 cfg.CreateMap<V1.Order, V2.Order>()
                     .ForMember(c => c.Payments, opt => opt.MapFrom(src => MapPaymentInfo(src)));
@@ -33,6 +34,7 @@ namespace VersionDb
                     .ForMember(c => c.PaymentDetails, opt => opt.MapFrom(src => MapPaymentDetails(src)));
             });
 
+            // TODO: More use of generics in extension method?
             app.VersionDb("order",
                 new List<KeyValuePair<string, Type>> {
                     KeyValuePair.Create("v1", typeof(V1.Order)),
