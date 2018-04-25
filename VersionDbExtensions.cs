@@ -23,14 +23,14 @@ namespace VersionDb
                 string requestedVersion = context.GetRouteValue("version") as string;
 
                 // TODO: Not Found
-                (string dataVersion, object value) = Database.Get(id);
+                VersionedDocument versionedDocument = Database<VersionedDocument>.Get(id);
                 
                 // TODO: Handle unknown versions
                 Type requestedType = versions.Single(p => p.Key == requestedVersion).Value;
-                Type dataType = versions.Single(p => p.Key == dataVersion).Value;
+                Type dataType = versions.Single(p => p.Key == versionedDocument.Version).Value;
 
                 // TODO: do some iterative mapping up or down the version chain until we get the one we want.
-                object mappedOutput = AutoMapper.Mapper.Map(value, dataType, requestedType);
+                object mappedOutput = AutoMapper.Mapper.Map(versionedDocument.Document, dataType, requestedType);
                 
                 return context.Response.WriteAsync(JsonConvert.SerializeObject(mappedOutput));
             });
@@ -51,7 +51,7 @@ namespace VersionDb
 
                 object data = JsonConvert.DeserializeObject(body, type);
 
-                Database.Put(id, requestedVersion, data);
+                Database<VersionedDocument>.Put(id, new VersionedDocument { Version = requestedVersion, Document = data });
 
                 return context.Response.WriteAsync("ok");
             });
