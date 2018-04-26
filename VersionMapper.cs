@@ -16,14 +16,12 @@ namespace VersionDb
             this.versions = versions;
         }
         
-        public VersionedDocument Parse(string json, string version)
+        public object Parse(string json, string version)
         {
             // TODO: Handle unknown versions
             Type type = versions.Single(p => p.Key == version).Value;
 
-            object data = JsonConvert.DeserializeObject(json, type);
-
-            return new VersionedDocument { Version = version, Document = data };
+            return JsonConvert.DeserializeObject(json, type);
         }
 
         public T ToCurrentVersion(VersionedDocument versionedDocument)
@@ -39,7 +37,7 @@ namespace VersionDb
             Type dataType = versions.Single(p => p.Key == versionedDocument.Version).Value;
 
             // TODO: do some iterative mapping up or down the version chain until we get the one we want.
-            return AutoMapper.Mapper.Map(versionedDocument.Document, dataType, requestedType);
+            return AutoMapper.Mapper.Map(this.Parse(versionedDocument.Document, versionedDocument.Version), dataType, requestedType);
         }
     }
 }

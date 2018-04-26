@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -14,17 +15,36 @@ namespace VersionDb
 
             string path = $"{typename}/{{version}}/{{id}}";
 
-            routeBuilder.MapGet(path, context =>
+            routeBuilder.MapGet(path, async context =>
             {
                 string id = context.GetRouteValue("id") as string;
                 string requestedVersion = context.GetRouteValue("version") as string;
 
-                // TODO: Not Found
-                VersionedDocument versionedDocument = Database<VersionedDocument>.Get(id);
-                
-                object mappedOutput = versionMapper.ToVersion(versionedDocument, requestedVersion);
+                if (context.Request.Query["watch"].Any())
+                {
+                    context.Response.ContentType = "text/event-stream";
 
-                return context.Response.WriteAsync(JsonConvert.SerializeObject(mappedOutput));
+                    foreach ( Change<VersionedDocument> change in Database<VersionedDocument>.Watch(id) )
+                    {
+                        object mappedOutput = versionMapper.ToVersion(change.Value, requestedVersion);
+                        
+                        await context.Response.WriteAsync(JsonConvert.SerializeObject(new {
+                            ChangeType = change.ChangeType,
+                            Id = change.Id,
+                            Value = mappedOutput
+                        }));
+                        await context.Response.WriteAsync(Environment.NewLine);
+                    }
+                }
+                else 
+                {
+                    // TODO: Not Found
+                    VersionedDocument versionedDocument = Database<VersionedDocument>.Get(id);
+                    
+                    object mappedOutput = versionMapper.ToVersion(versionedDocument, requestedVersion);
+                    
+                    await context.Response.WriteAsync(JsonConvert.SerializeObject(mappedOutput));
+                }
             });
 
             routeBuilder.MapPost(path, context => {
@@ -34,7 +54,13 @@ namespace VersionDb
 
                 string body = context.Request.Body.ReadAllText();
 
-                VersionedDocument versionedDocument = versionMapper.Parse(body, requestedVersion);
+                // format validation
+                versionMapper.Parse(body, requestedVersion);
+
+                VersionedDocument versionedDocument = new VersionedDocument {
+                    Version = requestedVersion, 
+                    Document = body
+                };
 
                 Database<VersionedDocument>.Put(id, versionedDocument);
 
@@ -46,6 +72,6 @@ namespace VersionDb
 
             var routes = routeBuilder.Build();
             app.UseRouter(routes);
-        }        
+        }     
     }
 }
