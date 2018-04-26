@@ -1,11 +1,14 @@
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using Newtonsoft.Json;
 
 namespace VersionDb
 {
     // TODO: Data Store IOC
-    public static class Database<T>
+    public class Database<T>
     {
         private static string ToDataRecord(T o)
         {
@@ -17,15 +20,15 @@ namespace VersionDb
             return JsonConvert.DeserializeObject<T>(s);
         }
 
-        static BlockingCollection<Change<T>> changes = new BlockingCollection<Change<T>>();
-        static Dictionary<string, string> data = new Dictionary<string, string>();
+        Subject<Change<T>> changes = new Subject<Change<T>>();
+        Dictionary<string, string> data = new Dictionary<string, string>();
 
-        public static T Get(string id)
+        public T Get(string id)
         {
             return FromDataRecord(data[id]);
         }
 
-        public static void Put(string id, T value)
+        public void Put(string id, T value)
         {
             ChangeType changeType = ChangeType.Create;
 
@@ -35,22 +38,21 @@ namespace VersionDb
             }
 
             data[id] = ToDataRecord(value);
-            changes.Add(new Change<T>(changeType, id, value));
+            changes.OnNext(new Change<T>(changeType, id, value));
         }
 
-        public static T Delete(string id)
+        public T Delete(string id)
         {
             var value = FromDataRecord(data[id]);
             data.Remove(id);
-            changes.Add(new Change<T>(ChangeType.Delete, id, value));            
+            changes.OnNext(new Change<T>(ChangeType.Delete, id, value));            
             return value;
         }
 
-        public static IEnumerable<Change<T>> Watch(string id)
+        public IEnumerable<Change<T>> Watch(string id)
         {
-            while ( true )
+            foreach ( var next in changes.Next() )
             {
-                var next = changes.Take();
                 if ( next.Id == id ) 
                 {
                     yield return next;

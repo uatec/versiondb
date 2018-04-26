@@ -11,6 +11,8 @@ namespace VersionDb
     {
         public static void VersionDb<TCurrentVersionType>(this IApplicationBuilder app, string typename, VersionMapper<TCurrentVersionType> versionMapper)
         {
+            var database = new Database<VersionedDocument>();
+            
             var routeBuilder = new RouteBuilder(app);
 
             string path = $"{typename}/{{version}}/{{id}}";
@@ -24,7 +26,7 @@ namespace VersionDb
                 {
                     context.Response.ContentType = "text/event-stream";
 
-                    foreach ( Change<VersionedDocument> change in Database<VersionedDocument>.Watch(id) )
+                    foreach ( Change<VersionedDocument> change in database.Watch(id) )
                     {
                         object mappedOutput = versionMapper.ToVersion(change.Value, requestedVersion);
                         
@@ -39,7 +41,7 @@ namespace VersionDb
                 else 
                 {
                     // TODO: Not Found
-                    VersionedDocument versionedDocument = Database<VersionedDocument>.Get(id);
+                    VersionedDocument versionedDocument = database.Get(id);
                     
                     object mappedOutput = versionMapper.ToVersion(versionedDocument, requestedVersion);
                     
@@ -62,7 +64,7 @@ namespace VersionDb
                     Document = body
                 };
 
-                Database<VersionedDocument>.Put(id, versionedDocument);
+                database.Put(id, versionedDocument);
 
                 return context.Response.WriteAsync("ok");
             });
@@ -73,7 +75,7 @@ namespace VersionDb
                 string requestedVersion = context.GetRouteValue("version") as string;
 
                 // TODO: Not Found
-                VersionedDocument versionedDocument = Database<VersionedDocument>.Delete(id);
+                VersionedDocument versionedDocument = database.Delete(id);
                 
                 object mappedOutput = versionMapper.ToVersion(versionedDocument, requestedVersion);
                 
