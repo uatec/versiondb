@@ -7,8 +7,7 @@ using Newtonsoft.Json;
 
 namespace VersionDb
 {
-    // TODO: Data Store IOC
-    public class Database<T>
+    public class Database<T> : IDatabase<T>
     {
         private static string ToDataRecord(T o)
         {

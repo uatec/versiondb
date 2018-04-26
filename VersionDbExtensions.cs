@@ -11,7 +11,7 @@ namespace VersionDb
     {
         public static void VersionDb<TCurrentVersionType>(this IApplicationBuilder app, string typename, VersionMapper<TCurrentVersionType> versionMapper)
         {
-            var database = new Database<VersionedDocument>();
+            IDatabase<VersionedDocument> database = new Database<VersionedDocument>();
             
             var routeBuilder = new RouteBuilder(app);
 
