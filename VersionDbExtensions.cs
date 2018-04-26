@@ -67,7 +67,19 @@ namespace VersionDb
                 return context.Response.WriteAsync("ok");
             });
 
-            // TODO: Delete operations
+            routeBuilder.MapDelete(path, async context =>
+            {
+                string id = context.GetRouteValue("id") as string;
+                string requestedVersion = context.GetRouteValue("version") as string;
+
+                // TODO: Not Found
+                VersionedDocument versionedDocument = Database<VersionedDocument>.Delete(id);
+                
+                object mappedOutput = versionMapper.ToVersion(versionedDocument, requestedVersion);
+                
+                await context.Response.WriteAsync(JsonConvert.SerializeObject(mappedOutput));
+            });
+            
             // TODO: Correct Put/Post behaviour
 
             var routes = routeBuilder.Build();
