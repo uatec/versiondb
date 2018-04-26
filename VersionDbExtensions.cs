@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -11,7 +8,7 @@ namespace VersionDb
 {
     public static class VersionDbExtensions
     {
-        public static void VersionDb(this IApplicationBuilder app, string typename, List<KeyValuePair<string, Type>> versions)
+        public static void VersionDb<TCurrentVersionType>(this IApplicationBuilder app, string typename, VersionMapper<TCurrentVersionType> versionMapper)
         {
             var routeBuilder = new RouteBuilder(app);
 
@@ -25,13 +22,8 @@ namespace VersionDb
                 // TODO: Not Found
                 VersionedDocument versionedDocument = Database<VersionedDocument>.Get(id);
                 
-                // TODO: Handle unknown versions
-                Type requestedType = versions.Single(p => p.Key == requestedVersion).Value;
-                Type dataType = versions.Single(p => p.Key == versionedDocument.Version).Value;
+                object mappedOutput = versionMapper.ToVersion(versionedDocument, requestedVersion);
 
-                // TODO: do some iterative mapping up or down the version chain until we get the one we want.
-                object mappedOutput = AutoMapper.Mapper.Map(versionedDocument.Document, dataType, requestedType);
-                
                 return context.Response.WriteAsync(JsonConvert.SerializeObject(mappedOutput));
             });
 
@@ -40,18 +32,11 @@ namespace VersionDb
                 string id = context.GetRouteValue("id") as string;
                 string requestedVersion = context.GetRouteValue("version") as string;
 
-                // TODO: Handle unknown versions
-                Type type = versions.Single(p => p.Key == requestedVersion).Value;
+                string body = context.Request.Body.ReadAllText();
 
-                string body = null;
-                using ( var reader = new StreamReader(context.Request.Body))
-                {
-                    body = reader.ReadToEnd();
-                }
+                VersionedDocument versionedDocument = versionMapper.Parse(body, requestedVersion);
 
-                object data = JsonConvert.DeserializeObject(body, type);
-
-                Database<VersionedDocument>.Put(id, new VersionedDocument { Version = requestedVersion, Document = data });
+                Database<VersionedDocument>.Put(id, versionedDocument);
 
                 return context.Response.WriteAsync("ok");
             });
