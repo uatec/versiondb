@@ -1,6 +1,6 @@
 using System;
 
-namespace VersionDb.V2
+namespace VersionDb.Demo.V2
 {
     public class Order
     {

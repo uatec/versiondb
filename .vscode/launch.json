@@ -1,7 +1,4 @@
 {
-   // Use IntelliSense to find out which attributes exist for C# debugging
-   // Use hover for the description of the existing attributes
-   // For further information visit https://github.com/OmniSharp/omnisharp-vscode/blob/master/debugger-launchjson.md
    "version": "0.2.0",
    "configurations": [
         {
@@ -9,8 +6,7 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/src/VersionDb/VersionDb/bin/Debug/netcoreapp2.0/VersionDb.dll",
+            "program": "${workspaceFolder}/src/VersionDb.Demo/bin/Debug/netcoreapp2.0/VersionDb.Demo.dll",
             "args": [],
             "cwd": "${workspaceFolder}",
             "stopAtEntry": false,
@@ -42,5 +38,5 @@
             "request": "attach",
             "processId": "${command:pickProcess}"
         }
-    ,]
+    ]
 }

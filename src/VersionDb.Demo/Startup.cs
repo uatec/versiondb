@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace VersionDb
+namespace VersionDb.Demo
 {
     public class Startup
     {
@@ -15,15 +15,6 @@ namespace VersionDb
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddRouting();
-        }
-
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
-        {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
 
             // TODO: Choice of mapper
             AutoMapper.Mapper.Initialize(cfg => {
@@ -33,6 +24,17 @@ namespace VersionDb
                     .ForMember(c => c.PaymentTotal, opt => opt.MapFrom(src => src.Payments.Amount))
                     .ForMember(c => c.PaymentDetails, opt => opt.MapFrom(src => MapPaymentDetails(src)));
             });
+
+            services.AddSingleton<IDatabase<VersionedDocument>, Database<VersionedDocument>>();
+        }
+
+        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        {
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
 
             // TODO: More use of generics in extension method?
             app.VersionDb("order",

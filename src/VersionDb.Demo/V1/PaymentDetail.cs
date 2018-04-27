@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace VersionDb.V1
+namespace VersionDb.Demo.V1
 {
     public class PaymentDetail 
     {
