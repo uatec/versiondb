@@ -143,12 +143,6 @@ namespace VersionDb.Etcd
                     yield return nextChange;
                     nextChange = null;
                 }
-
-                continue;
-                // if (!_running) return;
-                // something went wrong, delay 1 second and try again
-                // await Task.Delay(1000);
-                Thread.Sleep(1000);
             }
         }
     }
