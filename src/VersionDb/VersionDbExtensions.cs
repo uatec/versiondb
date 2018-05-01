@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
@@ -28,13 +29,19 @@ namespace VersionDb
 
                     foreach ( Change<VersionedDocument> change in database.Watch(id) )
                     {
-                        object mappedOutput = versionMapper.ToVersion(change.Value, requestedVersion);
+                        object mappedOutput = null;
+                        
+                        if ( change.Value != null ) 
+                        {
+                            mappedOutput = versionMapper.ToVersion(change.Value, requestedVersion);
+                        }
                         
                         await context.Response.WriteAsync(JsonConvert.SerializeObject(new {
                             ChangeType = change.ChangeType,
                             Id = change.Id,
                             Value = mappedOutput
                         }));
+                        
                         await context.Response.WriteAsync(Environment.NewLine);
                     }
                 }
@@ -69,17 +76,17 @@ namespace VersionDb
                 return context.Response.WriteAsync("ok");
             });
 
-            routeBuilder.MapDelete(path, async context =>
+            routeBuilder.MapDelete(path, context =>
             {
                 string id = context.GetRouteValue("id") as string;
                 string requestedVersion = context.GetRouteValue("version") as string;
 
                 // TODO: Not Found
-                VersionedDocument versionedDocument = database.Delete(id);
+                database.Delete(id);
                 
-                object mappedOutput = versionMapper.ToVersion(versionedDocument, requestedVersion);
-                
-                await context.Response.WriteAsync(JsonConvert.SerializeObject(mappedOutput));
+                context.Response.StatusCode = StatusCodes.Status204NoContent;
+
+                return Task.CompletedTask;
             });
             
             // TODO: Correct Put/Post behaviour

@@ -40,12 +40,10 @@ namespace VersionDb.Demo
             changes.OnNext(new Change<T>(changeType, id, value));
         }
 
-        public T Delete(string id)
+        public void Delete(string id)
         {
-            var value = FromDataRecord(data[id]);
             data.Remove(id);
-            changes.OnNext(new Change<T>(ChangeType.Delete, id, value));            
-            return value;
+            changes.OnNext(new Change<T>(ChangeType.Delete, id, default(T)));            
         }
 
         public IEnumerable<Change<T>> Watch(string id)

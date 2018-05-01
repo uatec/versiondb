@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\VersionDb\VersionDb.csproj" />
+    <ProjectReference Include="..\VersionDb.Etcd\VersionDb.Etcd.csproj" />
   </ItemGroup>
 
 </Project>

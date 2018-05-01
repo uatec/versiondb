@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using VersionDb.Etcd;
 
 namespace VersionDb.Demo
 {
@@ -25,7 +26,7 @@ namespace VersionDb.Demo
                     .ForMember(c => c.PaymentDetails, opt => opt.MapFrom(src => MapPaymentDetails(src)));
             });
 
-            services.AddSingleton<IDatabase<VersionedDocument>, Database<VersionedDocument>>();
+            services.AddSingleton<IDatabase<VersionedDocument>, EtcDatabase<VersionedDocument>>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
