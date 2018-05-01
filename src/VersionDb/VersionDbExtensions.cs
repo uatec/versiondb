@@ -12,8 +12,10 @@ namespace VersionDb
     {
         public static void VersionDb<TCurrentVersionType>(this IApplicationBuilder app, string typename, VersionMapper<TCurrentVersionType> versionMapper)
         {
-            IDatabase<VersionedDocument> database = (IDatabase<VersionedDocument>) app.ApplicationServices.GetService(typeof(IDatabase<VersionedDocument>));
+            IDatabaseFactory databaseFactory = (IDatabaseFactory) app.ApplicationServices.GetService(typeof(IDatabaseFactory));
             
+            IDatabase<VersionedDocument> database = databaseFactory.Build<VersionedDocument>(typename);
+
             var routeBuilder = new RouteBuilder(app);
 
             string path = $"{typename}/{{version}}/{{id}}";

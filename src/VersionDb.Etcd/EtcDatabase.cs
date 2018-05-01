@@ -18,32 +18,42 @@ namespace VersionDb.Etcd
         {
             return JsonConvert.DeserializeObject<T>(s);
         }
-        private readonly EtcdClient etcdClient;
 
-        public EtcDatabase()
+        private readonly EtcdClient etcdClient;
+        private readonly string typeName;
+
+        public EtcDatabase(string typeName)
         {
+            if (string.IsNullOrWhiteSpace(typeName))
+            {
+                throw new ArgumentException("message", nameof(typeName));
+            }
+
+            this.typeName = typeName;
+
             etcdClient = new EtcdClient(new EtcdClientOpitions {
                 Urls = new [] { "http://127.0.0.1:12379/" }
             });
         }
+        
         public void Delete(string id)
         {
-            etcdClient.DeleteNodeAsync($"/{id}").Wait();
+            etcdClient.DeleteNodeAsync($"/{typeName}/{id}").Wait();
         }
 
         public T Get(string id)
         {
-            return FromDataRecord(etcdClient.GetNodeValueAsync($"/{id}", ignoreKeyNotFoundException: true).Result);
+            return FromDataRecord(etcdClient.GetNodeValueAsync($"/{typeName}/{id}", ignoreKeyNotFoundException: true).Result);
         }
 
         public void Put(string id, T value)
         {
-            etcdClient.SetNodeAsync($"/{id}", ToDataRecord(value)).Wait();
+            etcdClient.SetNodeAsync($"/{typeName}/{id}", ToDataRecord(value)).Wait();
         }
 
         public IEnumerable<Change<T>> Watch(string id)
         {
-            string key = $"/{id}";
+            string key = $"/{typeName}/{id}";
             long? waitIndex = null;
             EtcdResponse resp;
             Change<T> nextChange = null;
@@ -140,7 +150,6 @@ namespace VersionDb.Etcd
                 // await Task.Delay(1000);
                 Thread.Sleep(1000);
             }
-
         }
     }
 }
