@@ -40,10 +40,10 @@ namespace VersionDb.Demo
             // TODO: More use of generics in extension method?
             app.VersionDb("order",
                 new VersionMapper<V2.Order> (
-                    "v2", 
+                    OrderVersions.Default, 
                     new List<KeyValuePair<string, Type>> {
-                        KeyValuePair.Create("v1", typeof(V1.Order)),
-                        KeyValuePair.Create("v2", typeof(V2.Order))
+                        KeyValuePair.Create(OrderVersions.V1, typeof(V1.Order)),
+                        KeyValuePair.Create(OrderVersions.V2, typeof(V2.Order))
                     }
                 )
             );
