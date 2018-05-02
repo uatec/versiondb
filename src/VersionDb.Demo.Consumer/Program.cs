@@ -14,7 +14,6 @@ namespace VersionDb.Demo.Consumer
             string hostname = "http://localhost:5000";
             
             Task.Run(() => Watcher(hostname));
-
             
             V2.IOrderClient orderClient = new V2.OrderClient(
                 new HttpClient()
