@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace VersionDb.Demo
+namespace VersionDb.Demo.Server
 {
     public class Program
     {

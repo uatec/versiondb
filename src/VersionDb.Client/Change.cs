@@ -1,4 +1,4 @@
-namespace VersionDb
+namespace VersionDb.Client
 {
     public class Change<T>
     {

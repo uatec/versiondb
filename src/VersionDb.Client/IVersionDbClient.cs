@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace VersionDb
+namespace VersionDb.Client
 {
     public interface IVersionDbClient<T>
     {

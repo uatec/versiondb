@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using Newtonsoft.Json;
 
-namespace VersionDb
+namespace VersionDb.Client
 {
     public class SimpleVersionDbClient<T> : IVersionDbClient<T>
     {

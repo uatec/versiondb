@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using VersionDb.Etcd;
 
-namespace VersionDb.Demo
+namespace VersionDb.Demo.Server
 {
     public class Startup
     {

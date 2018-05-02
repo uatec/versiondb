@@ -1,4 +1,4 @@
-namespace VersionDb
+namespace VersionDb.Client
 {
     public enum ChangeType 
     {
