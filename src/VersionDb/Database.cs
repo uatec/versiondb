@@ -5,7 +5,7 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Newtonsoft.Json;
 
-namespace VersionDb.Demo.Server
+namespace VersionDb
 {
     public class Database<T> : IDatabase<T>
     {
