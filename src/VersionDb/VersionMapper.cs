@@ -15,13 +15,16 @@ namespace VersionDb
             this.currentVersion = currentVersion;
             this.versions = versions;
         }
-        
+
         public object Parse(string json, string version)
         {
             // TODO: Handle unknown versions
             Type type = versions.Single(p => p.Key == version).Value;
 
-            return JsonConvert.DeserializeObject(json, type);
+            return JsonConvert.DeserializeObject(json, type, new JsonSerializerSettings
+            {
+                MissingMemberHandling = MissingMemberHandling.Error
+            });
         }
 
         public T ToCurrentVersion(VersionedDocument versionedDocument)

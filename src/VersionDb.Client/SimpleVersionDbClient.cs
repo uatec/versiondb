@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.IO;
 using System.Net.Http;
 using Newtonsoft.Json;
 
@@ -19,7 +20,9 @@ namespace VersionDb.Client
 
         public void Delete(string id)
         {
-            httpClient.DeleteAsync($"/{typeName}/{versionName}/{id}").Wait();
+            var response = httpClient.DeleteAsync($"/{typeName}/{versionName}/{id}").Result;
+
+            response.EnsureSuccessStatusCode();
         }
 
         public T Get(string id)
@@ -29,16 +32,32 @@ namespace VersionDb.Client
             return JsonConvert.DeserializeObject<T>(body);
         }
 
-        public void Put(string id, T value)
+        public void Post(string id, T value)
         {
             string body = JsonConvert.SerializeObject(value);
 
-            httpClient.PutAsync($"/{typeName}/{versionName}/{id}", new StringContent(body)).Wait();
+            var response = httpClient.PostAsync($"/{typeName}/{versionName}/{id}", new StringContent(body)).Result;
+            
+            response.EnsureSuccessStatusCode();
+
         }
 
         public IEnumerable<Change<T>> Watch(string id)
         {
-            throw new System.NotImplementedException();
+            var stream = httpClient.GetStreamAsync($"/{typeName}/{versionName}/{id}?watch=true").Result;
+
+            using (var reader = new StreamReader(stream)) {
+
+                while (!reader.EndOfStream) { 
+
+                    //We are ready to read the stream
+                    var currentLine = reader.ReadLine();
+
+                    Change<T> change = JsonConvert.DeserializeObject<Change<T>>(currentLine);
+
+                    yield return change;
+                }
+            }
         }
     }
 }

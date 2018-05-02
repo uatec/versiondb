@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using EtcdNet;
 using Newtonsoft.Json;
+using VersionDb.Client;
 
 namespace VersionDb.Etcd
 {
