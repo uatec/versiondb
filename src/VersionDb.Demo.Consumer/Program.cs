@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
 using System.Threading;
@@ -21,8 +22,12 @@ namespace VersionDb.Demo.Consumer
                     BaseAddress = new Uri(hostname)
                 });
             
+            Stopwatch stopwatch = null;
+
             while ( true ) 
             {
+                stopwatch = Stopwatch.StartNew();
+
                 orderClient.Post("cat", new V2.Order
                 {
                     Id = "cat",
@@ -34,6 +39,10 @@ namespace VersionDb.Demo.Consumer
                         Method = "VISA"
                     }
                 });
+
+                stopwatch.Stop();
+
+                Console.WriteLine($"Put: {stopwatch.ElapsedMilliseconds}ms");
 
                 Thread.Sleep(1500);
             }
