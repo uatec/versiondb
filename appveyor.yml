@@ -12,3 +12,7 @@ build_script:
   - cmd: dotnet pack src/VersionDb/VersionDb.csproj --include-symbols -o ./
   - cmd: dotnet pack src/VersionDb.Client/VersionDb.Client.csproj --include-symbols -o ./
   - cmd: dotnet pack src/VersionDb.Etcd/VersionDb.Etcd.csproj --include-symbols -o ./
+artifacts:
+  - path: '**\*.nupkg'
+    name: nuget
+    
