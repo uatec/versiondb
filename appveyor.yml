@@ -1,0 +1,14 @@
+version: '0.0.[build}'
+image: Visual Studio 2017
+branches:
+  only:
+  - master
+init: 
+  # Good practice, because Windows
+  - cmd: git config --global core.autocrlf true
+before_build:
+  - cmd: dotnet version
+build_script:
+  - cmd: dotnet pack src/VersionDb/VersionDb.csproj --include-symbols -o ./
+  - cmd: dotnet pack src/VersionDb.Client/VersionDb.Client.csproj --include-symbols -o ./
+  - cmd: dotnet pack src/VersionDb.Etcd/VersionDb.Etcd.csproj --include-symbols -o ./
