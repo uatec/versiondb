@@ -5,21 +5,19 @@ using Newtonsoft.Json;
 
 namespace VersionDb
 {
-    public class VersionMapper<T>
+    public class VersionMapper
     {
-        private readonly string currentVersion;
-        private readonly List<KeyValuePair<string, Type>> versions;
+        private readonly VersionRegistration[] versions;
 
-        public VersionMapper(string currentVersion, List<KeyValuePair<string, Type>> versions)
+        public VersionMapper(params VersionRegistration[] versions)
         {
-            this.currentVersion = currentVersion;
             this.versions = versions;
         }
 
         public object Parse(string json, string version)
         {
             // TODO: Handle unknown versions
-            Type type = versions.Single(p => p.Key == version).Value;
+            Type type = versions.Single(p => p.VersionCode == version).Type;
 
             return JsonConvert.DeserializeObject(json, type, new JsonSerializerSettings
             {
@@ -27,17 +25,11 @@ namespace VersionDb
             });
         }
 
-        public T ToCurrentVersion(VersionedDocument versionedDocument)
-        {
-            return (T) this.ToVersion(versionedDocument, this.currentVersion);
-        }
-
         public object ToVersion(VersionedDocument versionedDocument, string version)
         {
-
             // TODO: Handle unknown versions
-            Type requestedType = versions.Single(p => p.Key == version).Value;
-            Type dataType = versions.Single(p => p.Key == versionedDocument.Version).Value;
+            Type requestedType = versions.Single(p => p.VersionCode == version).Type;
+            Type dataType = versions.Single(p => p.VersionCode == versionedDocument.Version).Type;
 
             // TODO: do some iterative mapping up or down the version chain until we get the one we want.
             return AutoMapper.Mapper.Map(this.Parse(versionedDocument.Document, versionedDocument.Version), dataType, requestedType);

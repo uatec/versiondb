@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
@@ -37,15 +36,11 @@ namespace VersionDb.Demo.Server
                 app.UseDeveloperExceptionPage();
             }
 
-            // TODO: More use of generics in extension method?
             app.VersionDb("order",
-                new VersionMapper<V2.Order> (
-                    OrderVersions.Default, 
-                    new List<KeyValuePair<string, Type>> {
-                        KeyValuePair.Create(OrderVersions.V1, typeof(V1.Order)),
-                        KeyValuePair.Create(OrderVersions.V2, typeof(V2.Order))
-                    }
-                )
+                new VersionRegistration(OrderVersions.V1, typeof(V1.Order), 
+                    upgrade: o => AutoMapper.Mapper.Map(o, typeof(V1.Order), typeof(V2.Order))),
+                new VersionRegistration(OrderVersions.V2, typeof(V2.Order), 
+                    downgrade: o => AutoMapper.Mapper.Map(o, typeof(V2.Order), typeof(V1.Order)))
             );
         }
 

@@ -11,8 +11,11 @@ namespace VersionDb
 {
     public static class VersionDbExtensions
     {
-        public static void VersionDb<TCurrentVersionType>(this IApplicationBuilder app, string typename, VersionMapper<TCurrentVersionType> versionMapper)
+        public static void VersionDb(this IApplicationBuilder app, string typename, 
+            params VersionRegistration[] versions)
         {
+            VersionMapper versionMapper = new VersionMapper(versions);
+
             IDatabaseFactory databaseFactory = (IDatabaseFactory) app.ApplicationServices.GetService(typeof(IDatabaseFactory));
             
             IDatabase<VersionedDocument> database = databaseFactory.Build<VersionedDocument>(typename);
