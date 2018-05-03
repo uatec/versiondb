@@ -7,7 +7,7 @@ init:
   # Good practice, because Windows
   - cmd: git config --global core.autocrlf true
 before_build:
-  - cmd: dotnet version
+  - cmd: dotnet --info
 build_script:
   - cmd: dotnet pack src/VersionDb/VersionDb.csproj --include-symbols -o ./
   - cmd: dotnet pack src/VersionDb.Client/VersionDb.Client.csproj --include-symbols -o ./
