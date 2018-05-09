@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Newtonsoft.Json;
@@ -55,6 +56,14 @@ namespace VersionDb
                 {
                     yield return next;
                 }
+            }
+        }
+
+        public IEnumerable<Change<T>> Watch()
+        {
+            foreach ( var next in changes.Next() )
+            {
+                yield return next;
             }
         }
     }

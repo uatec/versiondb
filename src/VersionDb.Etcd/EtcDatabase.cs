@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using EtcdNet;
@@ -39,22 +40,25 @@ namespace VersionDb.Etcd
         
         public void Delete(string id)
         {
-            etcdClient.DeleteNodeAsync($"/{typeName}/{id}").Wait();
+            etcdClient.DeleteNodeAsync(CreateKey(id)).Wait();
         }
 
         public T Get(string id)
         {
-            return FromDataRecord(etcdClient.GetNodeValueAsync($"/{typeName}/{id}", ignoreKeyNotFoundException: true).Result);
+            return FromDataRecord(etcdClient.GetNodeValueAsync(CreateKey(id), ignoreKeyNotFoundException: true).Result);
         }
 
         public void Put(string id, T value)
         {
-            etcdClient.SetNodeAsync($"/{typeName}/{id}", ToDataRecord(value)).Wait();
+            etcdClient.SetNodeAsync(CreateKey(id), ToDataRecord(value)).Wait();
         }
+
+        private string CreateKey(string id) => $"/{typeName}/{id}";
+        private string ParseKey(string key) => key.Split('/').Last();
 
         public IEnumerable<Change<T>> Watch(string id)
         {
-            string key = $"/{typeName}/{id}";
+            string key = CreateKey(id);
             long? waitIndex = null;
             EtcdResponse resp;
             Change<T> nextChange = null;
@@ -92,28 +96,29 @@ namespace VersionDb.Etcd
 
                         if (resp.Node.Key.StartsWith(key, StringComparison.InvariantCultureIgnoreCase))
                         {
+                            string nodeId = ParseKey(resp.Node.Key);
                             T value = resp.Node.Value != null ? FromDataRecord(resp.Node.Value) : default(T);
 
                             switch(resp.Action.ToLowerInvariant())
                             {
                                 case EtcdResponse.ACTION_DELETE:
-                                    nextChange = new Change<T>(ChangeType.Delete, id, value);
+                                    nextChange = new Change<T>(ChangeType.Delete, nodeId, value);
                                     break;
                                 case EtcdResponse.ACTION_EXPIRE:
-                                    nextChange = new Change<T>(ChangeType.Delete, id, value);                             
+                                    nextChange = new Change<T>(ChangeType.Delete, nodeId, value);                             
                                     break;
                                 case EtcdResponse.ACTION_COMPARE_AND_DELETE:
-                                    nextChange = new Change<T>(ChangeType.Delete, id, default(T));                                
+                                    nextChange = new Change<T>(ChangeType.Delete, nodeId, default(T));                                
                                     break;
 
                                 case EtcdResponse.ACTION_SET:
-                                    nextChange = new Change<T>(ChangeType.Update, id, value);                                
+                                    nextChange = new Change<T>(ChangeType.Update, nodeId, value);                                
                                     break;
                                 case EtcdResponse.ACTION_CREATE:
-                                    nextChange = new Change<T>(ChangeType.Create, id, value);                               
+                                    nextChange = new Change<T>(ChangeType.Create, nodeId, value);                               
                                     break;
                                 case EtcdResponse.ACTION_COMPARE_AND_SWAP:
-                                    nextChange = new Change<T>(ChangeType.Update, id, value);                                
+                                    nextChange = new Change<T>(ChangeType.Update, nodeId, value);                                
                                     break;
                                 default:
                                     break;
@@ -145,6 +150,11 @@ namespace VersionDb.Etcd
                     nextChange = null;
                 }
             }
+        }
+
+        public IEnumerable<Change<T>> Watch()
+        {
+            return Watch(null);
         }
     }
 }

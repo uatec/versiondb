@@ -56,7 +56,7 @@ namespace VersionDb.Demo.Consumer
                     BaseAddress = new Uri(hostname)
                 });
 
-            foreach (Change<V1.Order> change in orderClient.Watch("cat"))
+            foreach (Change<V1.Order> change in orderClient.Watch())
             {
                 if (change.Value == null) continue; // Ignore deletions in this demo
 

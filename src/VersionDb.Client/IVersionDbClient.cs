@@ -8,5 +8,6 @@ namespace VersionDb.Client
         void Post(string id, T value);
         void Delete(string id);
         IEnumerable<Change<T>> Watch(string id);
+        IEnumerable<Change<T>> Watch();
     }
 }

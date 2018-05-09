@@ -9,6 +9,7 @@ namespace VersionDb
         T Get(string id);
         void Put(string id, T value);
         void Delete(string id);
+        IEnumerable<Change<T>> Watch();
         IEnumerable<Change<T>> Watch(string id);
     }
 }

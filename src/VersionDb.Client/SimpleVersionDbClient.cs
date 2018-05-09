@@ -39,12 +39,29 @@ namespace VersionDb.Client
             var response = httpClient.PostAsync($"/{typeName}/{versionName}/{id}", new StringContent(body)).Result;
             
             response.EnsureSuccessStatusCode();
-
         }
 
         public IEnumerable<Change<T>> Watch(string id)
         {
             var stream = httpClient.GetStreamAsync($"/{typeName}/{versionName}/{id}?watch=true").Result;
+
+            using (var reader = new StreamReader(stream)) {
+
+                while (!reader.EndOfStream) { 
+
+                    //We are ready to read the stream
+                    var currentLine = reader.ReadLine();
+
+                    Change<T> change = JsonConvert.DeserializeObject<Change<T>>(currentLine);
+
+                    yield return change;
+                }
+            }
+        }
+
+        public IEnumerable<Change<T>> Watch()
+        {
+            var stream = httpClient.GetStreamAsync($"/{typeName}/{versionName}?watch=true").Result;
 
             using (var reader = new StreamReader(stream)) {
 

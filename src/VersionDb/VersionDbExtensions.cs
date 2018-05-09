@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
@@ -23,6 +24,39 @@ namespace VersionDb
             var routeBuilder = new RouteBuilder(app);
 
             string path = $"{typename}/{{version}}/{{id}}";
+
+            routeBuilder.MapGet($"{typename}/{{version}}", async context =>
+            {
+                string requestedVersion = context.GetRouteValue("version") as string;
+
+                if (context.Request.Query["watch"].Any())
+                {
+                    context.Response.ContentType = "text/event-stream";
+
+                    foreach ( Change<VersionedDocument> change in database.Watch() )
+                    {
+                        object mappedOutput = null;
+                        
+                        if ( change.Value != null ) 
+                        {
+                            mappedOutput = versionMapper.ToVersion(change.Value, requestedVersion);
+                        }
+                        
+                        await context.Response.WriteAsync(JsonConvert.SerializeObject(new {
+                            ChangeType = change.ChangeType,
+                            Id = change.Id,
+                            Value = mappedOutput
+                        }));
+                        
+                        await context.Response.WriteAsync(Environment.NewLine);
+                    }
+                }
+                else
+                {
+                    // TODO : Figure out what we will be doing here
+                    throw new NotImplementedException("i'm not sure how 'get all' fits in, even though we want 'watch all'");
+                }
+            });
 
             routeBuilder.MapGet(path, async context =>
             {
