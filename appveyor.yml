@@ -7,8 +7,8 @@ branches:
   - master
 build:
   verbosity: minimal
-  configuration: Debug
   publish_nuget: true
+configuration: Debug
 dotnet_csproj:
   patch: true
   file: '**\*.csproj'
