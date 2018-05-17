@@ -4,12 +4,11 @@ branches:
   only:
   - master
 before_build:
-  - sh: cat src/VersionDb/VersionDb.csproj
   - dotnet restore
 build_script:
-  - dotnet pack src/VersionDb/VersionDb.csproj --include-symbols -o ./
-  - dotnet pack src/VersionDb.Client/VersionDb.Client.csproj --include-symbols -o ./
-  - dotnet pack src/VersionDb.Etcd/VersionDb.Etcd.csproj --include-symbols -o ./
+  - dotnet pack src/VersionDb/VersionDb.csproj --include-symbols /p:Version=$APPVEYOR_BUILD_VERSION -o ./
+  - dotnet pack src/VersionDb.Client/VersionDb.Client.csproj --include-symbols /p:Version=$APPVEYOR_BUILD_VERSION -o ./
+  - dotnet pack src/VersionDb.Etcd/VersionDb.Etcd.csproj --include-symbols /p:Version=$APPVEYOR_BUILD_VERSION -o ./
 dotnet_csproj:
   patch: true
   file: '**\*.csproj'
