@@ -1,17 +1,22 @@
-version: '0.0.{build}'
-image: Visual Studio 2017
+version: '1.0.{build}'
+image: 
+  - Visual Studio 2017
+  - Ubuntu
 branches:
   only:
   - master
-init: 
-  # Good practice, because Windows
-  - cmd: git config --global core.autocrlf true
-before_build:
-  - cmd: dotnet --info
-build_script:
-  - cmd: dotnet pack src/VersionDb/VersionDb.csproj --include-symbols -o ./
-  - cmd: dotnet pack src/VersionDb.Client/VersionDb.Client.csproj --include-symbols -o ./
-  - cmd: dotnet pack src/VersionDb.Etcd/VersionDb.Etcd.csproj --include-symbols -o ./
+build:
+  verbosity: minimal
+  configuration: Debug
+  publish_nuget: true
+dotnet_csproj:
+  patch: true
+  file: '**\*.csproj'
+  version: '{version}'
+  package_version: '{version}'
+  assembly_version: '{version}'
+  file_version: '{version}'
+  informational_version: '{version}'
 artifacts:
   - path: '**\*.nupkg'
     name: nuget
