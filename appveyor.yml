@@ -5,7 +5,7 @@ image:
 branches:
   only:
   - master
-before_build:: 
+before_build:
   - dotnet restore
 build:
   verbosity: minimal
