@@ -5,8 +5,7 @@ image:
 branches:
   only:
   - master
-init: 
-  # Good practice, because Windows
+before_build:: 
   - dotnet restore
 build:
   verbosity: minimal
