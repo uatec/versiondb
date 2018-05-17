@@ -4,6 +4,7 @@ branches:
   only:
   - master
 before_build:
+  - sh: cat src/VersionDb/VersionDb.csproj
   - dotnet restore
 build_script:
   - dotnet pack src/VersionDb/VersionDb.csproj --include-symbols -o ./
