@@ -7,10 +7,10 @@ branches:
   - master
 before_build:
   - dotnet restore
-build:
-  verbosity: minimal
-  publish_nuget: true
-configuration: Debug
+build_script:
+  - dotnet pack src/VersionDb/VersionDb.csproj --include-symbols -o ./
+  - dotnet pack src/VersionDb.Client/VersionDb.Client.csproj --include-symbols -o ./
+  - dotnet pack src/VersionDb.Etcd/VersionDb.Etcd.csproj --include-symbols -o ./
 dotnet_csproj:
   patch: true
   file: '**\*.csproj'
