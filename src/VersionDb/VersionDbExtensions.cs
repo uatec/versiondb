@@ -53,8 +53,12 @@ namespace VersionDb
                 }
                 else
                 {
-                    // TODO : Figure out what we will be doing here
-                    throw new NotImplementedException("i'm not sure how 'get all' fits in, even though we want 'watch all'");
+                    // TODO: Not Found
+                    IEnumerable<VersionedDocument> versionedDocuments = database.GetAll();
+                    
+                    IEnumerable<object> mappedOutputs = versionedDocuments.Select(vd => versionMapper.ToVersion(vd, requestedVersion));
+                    
+                    await context.Response.WriteAsync(JsonConvert.SerializeObject(mappedOutputs));
                 }
             });
 

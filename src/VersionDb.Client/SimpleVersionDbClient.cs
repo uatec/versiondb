@@ -32,6 +32,13 @@ namespace VersionDb.Client
             return JsonConvert.DeserializeObject<T>(body);
         }
 
+        public IEnumerable<T> GetAll()
+        {
+            var body = httpClient.GetStringAsync($"/{typeName}/{versionName}").Result;
+
+            return JsonConvert.DeserializeObject<IEnumerable<T>>(body);
+        }
+
         public void Post(string id, T value)
         {
             string body = JsonConvert.SerializeObject(value);

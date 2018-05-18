@@ -60,10 +60,14 @@ namespace VersionDb.Demo.Consumer
             {
                 if (change.Value == null) continue; // Ignore deletions in this demo
 
-                DateTimeOffset createdDate = change.Value.PaymentDetails.Single().Date;
-                TimeSpan latency = DateTimeOffset.Now - createdDate;
+                DateTimeOffset createdDateInEvent = change.Value.PaymentDetails.Single().Date;
+                TimeSpan latency = DateTimeOffset.Now - createdDateInEvent;
 
-                Console.WriteLine($"{createdDate:o} - Latency: {latency.TotalMilliseconds}ms");
+                Console.WriteLine($"{createdDateInEvent:o} - Latency: {latency.TotalMilliseconds}ms");
+
+                DateTimeOffset createdDateInGetAllResponse = orderClient.GetAll().Single().PaymentDetails.Single().Date;
+                
+                Console.WriteLine($"{createdDateInGetAllResponse:o}");
             }
         }
     }

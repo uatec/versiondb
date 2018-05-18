@@ -156,5 +156,16 @@ namespace VersionDb.Etcd
         {
             return Watch(null);
         }
+
+        public IEnumerable<T> GetAll()
+        {
+            return 
+                etcdClient
+                    .GetNodeAsync($"/{typeName}")
+                    .Result
+                    .Node
+                    .Nodes
+                    .Select(n => FromDataRecord(n.Value));
+        }
     }
 }

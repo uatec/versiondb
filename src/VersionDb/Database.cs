@@ -66,5 +66,10 @@ namespace VersionDb
                 yield return next;
             }
         }
+
+        public IEnumerable<T> GetAll()
+        {
+            return data.Values.Select(v => FromDataRecord(v));
+        }
     }
 }

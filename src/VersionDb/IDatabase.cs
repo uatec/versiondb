@@ -11,5 +11,6 @@ namespace VersionDb
         void Delete(string id);
         IEnumerable<Change<T>> Watch();
         IEnumerable<Change<T>> Watch(string id);
+        IEnumerable<T> GetAll();
     }
 }
