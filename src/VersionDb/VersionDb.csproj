@@ -7,7 +7,7 @@
 
   <ItemGroup>
     <PackageReference Include="Automapper" Version="6.2.2" />
-    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.Routing" Version="2.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.0.2" />
     <PackageReference Include="System.Reactive" Version="4.0.0-preview00001" />
